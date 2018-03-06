@@ -16,6 +16,7 @@ const WorkflowCard = ({
   onDelete,
   canPublish,
   onPublish,
+  getPreview
 }) => (
   <div className="nc-workflow-card">
     <Link to={editLink} className="nc-workflow-link">
@@ -35,6 +36,9 @@ const WorkflowCard = ({
         onClick={onPublish}
       >
         {isModification ? 'Publish changes' : 'Publish new entry'}
+      </button>
+      <button className="nc-workflow-card-buttonPreview" onClick={getPreview}>
+        Deploy Preview
       </button>
     </div>
   </div>

@@ -1,6 +1,6 @@
 backend:
   name: github
-  repo: celartem/extensis-cms
+  repo: aponder-celartem/verbose-bassoon
 
 publish_mode: editorial_workflow
 

@@ -307,22 +307,28 @@ export default class API {
     if (!unpublished) {
       // Open new editorial review workflow for this entry - Create new metadata and commit to new branch`
       let prResponse;
+      let lastSuccessfulCommit;
 
       return this.getBranch()
       .then(branchData => this.updateTree(branchData.commit.sha, "/", fileTree))
       .then(changeTree => this.commit(options.commitMessage, changeTree))
       .then(commitResponse => this.createBranch(branchName, commitResponse.sha))
       .then(branchResponse => this.createPR(options.commitMessage, branchName))
-      .then(pr => {
+      .then((pr) => {
         prResponse = pr;
+        return this.getLastSuccessfulCommit(pr.head.sha);
+      })
+      .then((commitResponse) => {
+        lastSuccessfulCommit = commitResponse;
         return this.user();
       })
-      .then(user => {
-        return this.storeMetadata(contentKey, {
+      .then(user =>
+        this.storeMetadata(contentKey, {
           type: "PR",
           pr: {
             number: prResponse.number,
             head: prResponse.head && prResponse.head.sha,
+            target_url: lastSuccessfulCommit.statuses && lastSuccessfulCommit.statuses[0].target_url,
           },
           user: user.name || user.login,
           status: status.first(),
@@ -338,46 +344,47 @@ export default class API {
             files: filesList,
           },
           timeStamp: new Date().toISOString(),
-        });
-      });
-    } else {
-      // Entry is already on editorial review workflow - just update metadata and commit to existing branch
-      let newHead;
-      return this.getBranch(branchName)
-        .then(branchData => this.updateTree(branchData.commit.sha, "/", fileTree))
-        .then(changeTree => this.commit(options.commitMessage, changeTree))
-        .then(commit => {
-          newHead = commit;
-          return this.retrieveMetadata(contentKey);
         })
-        .then(metadata => {
-          const { title, description } = options.parsedData || {};
-          const metadataFiles = get(metadata.objects, 'files', []);
-          const files = [ ...metadataFiles, ...filesList ];
-          const pr = { ...metadata.pr, head: newHead.sha };
-          const objects = {
-            entry: { path: entry.path, sha: entry.sha },
-            files: uniq(files),
-          };
-          const updatedMetadata = { ...metadata, pr, title, description, objects };
-
-          /**
-           * If an asset store is in use, assets are always accessible, so we
-           * can just finish the persist operation here.
-           */
-          if (options.hasAssetStore) {
-            return this.storeMetadata(contentKey, updatedMetadata)
-              .then(() => this.patchBranch(branchName, newHead.sha));
-          }
-
-          /**
-           * If no asset store is in use, assets are being stored in the content
-           * repo, which means pull requests opened for editorial workflow
-           * entries must be rebased if assets have been added or removed.
-           */
-          return this.rebasePullRequest(pr.number, branchName, contentKey, metadata, newHead);
-        });
+      );
     }
+
+    // Entry is already on editorial review workflow - just update metadata and commit to existing branch
+    let newHead;
+
+    return this.getBranch(branchName)
+      .then(branchData => this.updateTree(branchData.commit.sha, "/", fileTree))
+      .then(changeTree => this.commit(options.commitMessage, changeTree))
+      .then((commit) => {
+        newHead = commit;
+        return this.retrieveMetadata(contentKey);
+      })
+      .then((metadata) => {
+        const { title, description } = options.parsedData || {};
+        const metadataFiles = get(metadata.objects, 'files', []);
+        const files = [...metadataFiles, ...filesList];
+        const pr = { ...metadata.pr, head: newHead.sha };
+        const objects = {
+          entry: { path: entry.path, sha: entry.sha },
+          files: uniq(files),
+        };
+        const updatedMetadata = { ...metadata, pr, title, description, objects };
+
+        /**
+         * If an asset store is in use, assets are always accessible, so we
+         * can just finish the persist operation here.
+         */
+        if (options.hasAssetStore) {
+          return this.storeMetadata(contentKey, updatedMetadata)
+            .then(() => this.patchBranch(branchName, newHead.sha));
+        }
+
+        /**
+         * If no asset store is in use, assets are being stored in the content
+         * repo, which means pull requests opened for editorial workflow
+         * entries must be rebased if assets have been added or removed.
+         */
+        return this.rebasePullRequest(pr.number, branchName, contentKey, metadata, newHead);
+      });
   }
 
   /**
@@ -503,6 +510,26 @@ export default class API {
    */
   getPullRequestCommits (prNumber) {
     return this.request(`${ this.repoURL }/pulls/${prNumber}/commits`);
+  }
+
+  /**
+   * Return the target_url property for a given ref. Retry until the commit status 
+   * returns a state of `success`.
+   */
+  getLastSuccessfulCommit (ref) {
+    return this.getCommitStatus(ref).then((status) => {
+      if (status.state === 'success') {
+        return status;
+      }
+      return this.getLastSuccessfulCommit(ref);
+    });
+  }
+
+  /**
+   * Get the combined view of commit statuses for a given ref.
+   */
+  getCommitStatus(ref) {
+    return this.request(`${ this.repoURL }/commits/${ ref }/status`);
   }
 
   /**
