@@ -62,7 +62,8 @@
 }
 
 .nc-workflow-card-buttonDelete,
-.nc-workflow-card-buttonPublish {
+.nc-workflow-card-buttonPublish,
+.nc-workflow-card-buttonPreview {
   width: auto;
   flex: 1 0 0;
   font-size: 13px;
@@ -79,9 +80,14 @@
   background-color: var(--colorTeal);
   color: var(--colorTextLight);
   margin-left: 6px;
+  margin-right: 6px;
 }
 
 .nc-workflow-card-buttonPublishDisabled {
   background-color: var(--colorGrayLight);
   color: var(--colorGray);
+}
+
+.nc-workflow-card-buttonPreview {
+  margin-left: 6px;
 }
