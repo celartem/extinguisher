@@ -1,7 +1,7 @@
 {
-  "name": "netlify-cms",
+  "name": "extinguisher",
   "version": "1.3.5",
-  "description": "Netlify CMS lets content editors work on structured content stored in git",
+  "description": "Fork of NetlifyCMS with a customized editorial workflow for Extensis",
   "main": "dist/cms.js",
   "scripts": {
     "start": "npm run dev",
@@ -60,7 +60,7 @@
     "static site generators",
     "jamstack"
   ],
-  "author": "Netlify",
+  "author": "Extensis",
   "license": "MIT",
   "browserslist": [
     "last 2 Chrome versions",

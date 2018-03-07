@@ -785,7 +785,7 @@
       "name": "Kristaps Taube",
       "avatar_url": "https://avatars3.githubusercontent.com/u/1479451?v=4",
       "profile": "https://www.ktaube.com",
-       "contributions": [
+      "contributions": [
         "code"
       ]
     },
@@ -805,6 +805,17 @@
       "profile": "http://www.txorua.com",
       "contributions": [
         "design"
+      ]
+    },
+    {
+      "login": "aponder-celartem",
+      "name": "Alex Ponder",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/36905089?v=4",
+      "profile": "https://github.com/aponder-celartem",
+      "contributions": [
+        "code",
+        "design",
+        "doc"
       ]
     }
   ]
