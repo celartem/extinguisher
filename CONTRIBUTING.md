@@ -8,7 +8,7 @@ please read the [code of conduct](CODE_OF_CONDUCT.md).
 > Install yarn on your system: [https://yarnpkg.com/en/docs/install](https://yarnpkg.com/en/docs/install)
 
 ```sh
-$ git clone https://github.com/netlify/netlify-cms
+$ git clone https://github.com/celartem/extinguisher
 $ cd netlify-cms
 $ yarn
 ```
@@ -49,7 +49,7 @@ We actively welcome your pull requests.
 4. Ensure the test suite passes.
 5. Make sure your code lints.
 6. PR's must be rebased before merge (feel free to ask for help)
-7. PR should be reviewed by two maintainers (@erquhart, @Benaiah, @tech4him1) prior to merging.
+7. PR should be reviewed by two maintainers (@aponder-celartem, @bwolfe-celartem, @jbowers-celartem) prior to merging.
 
 ## Add yourself as a contributor
 
@@ -66,5 +66,5 @@ type.
 
 ## License
 
-By contributing to Netlify CMS, you agree that your contributions will be licensed
+By contributing to Extinguisher, you agree that your contributions will be licensed
 under its [MIT license](LICENSE).
