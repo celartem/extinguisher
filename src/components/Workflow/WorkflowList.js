@@ -35,6 +35,10 @@ class WorkflowList extends React.Component {
     handleDelete: PropTypes.func.isRequired,
   };
 
+  getDeployPreview = (previewUrl) => {
+    window.open(previewUrl);
+  };
+
   handleChangeStatus = (newStatus, dragProps) => {
     const slug = dragProps.slug;
     const collection = dragProps.collection;
@@ -101,6 +105,7 @@ Please drag the card to the "Ready" column to enable publishing.`
             const collection = entry.getIn(['metaData', 'collection']);
             const isModification = entry.get('isModification');
             const canPublish = ownStatus === status.last() && !entry.get('isPersisting', false);
+            const previewUrl = entry.getIn(['metaData', 'pr', 'target_url']);
             return (
               <DragSource
                 namespace={DNDNamespace}
@@ -123,6 +128,7 @@ Please drag the card to the "Ready" column to enable publishing.`
                     onDelete={this.requestDelete.bind(this, collection, slug, ownStatus)}
                     canPublish={canPublish}
                     onPublish={this.requestPublish.bind(this, collection, slug, ownStatus)}
+                    getPreview={this.getDeployPreview.bind(this, previewUrl)}
                   />
                 </div>
               )}
