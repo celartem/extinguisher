@@ -316,7 +316,7 @@ export default class API {
       .then(branchResponse => this.createPR(options.commitMessage, branchName))
       .then((pr) => {
         prResponse = pr;
-        return this.getLastSuccessfulCommit(pr.head.sha);
+        return this.getCommitStatus(pr.head.sha);
       })
       .then((commitResponse) => {
         lastSuccessfulCommit = commitResponse;
@@ -513,22 +513,25 @@ export default class API {
   }
 
   /**
-   * Return the target_url property for a given ref. Retry until the commit status 
-   * returns a state of `success`.
+   * Return the target_url property for a given ref. Retry every 2s until the 
+   * commit status returns a state other than `pending`. Possible states are 
+   * error, failure, and success.
    */
-  getLastSuccessfulCommit (ref) {
-    return this.getCommitStatus(ref).then((status) => {
-      if (status.state === 'success') {
-        return status;
+  getCommitStatus(ref) {
+    return this.getCombinedStatusForRef(ref)
+    .then((status) => {
+      if (status.state === 'pending') {
+        return new Promise(delay => setTimeout(delay, 2000))
+          .then(() => this.getCommitStatus(ref));
       }
-      return this.getLastSuccessfulCommit(ref);
+      return status;
     });
   }
 
   /**
    * Get the combined view of commit statuses for a given ref.
    */
-  getCommitStatus(ref) {
+  getCombinedStatusForRef(ref) {
     return this.request(`${ this.repoURL }/commits/${ ref }/status`);
   }
 
