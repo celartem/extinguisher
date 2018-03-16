@@ -17,6 +17,7 @@ import {
   UNPUBLISHED_ENTRY_DELETE_REQUEST,
   UNPUBLISHED_ENTRY_DELETE_SUCCESS,
   UNPUBLISHED_ENTRY_DELETE_FAILURE,
+  UNPUBLISHED_ENTRY_TOGGLE_DISPLAY,
 } from 'Actions/editorialWorkflow';
 import { CONFIG_SUCCESS } from 'Actions/config';
 
@@ -89,6 +90,10 @@ const unpublishedEntries = (state = Map(), action) => {
 
     case UNPUBLISHED_ENTRY_DELETE_SUCCESS:
       return state.deleteIn(['entities', `${ action.payload.collection }.${ action.payload.slug }`]);
+
+    case UNPUBLISHED_ENTRY_TOGGLE_DISPLAY:
+      return state.updateIn(['entities', `${ action.payload.collection }.${ action.payload.slug }`, 'isHidden'], false, 
+        entry => !entry.isHidden);
 
     default:
       return state;

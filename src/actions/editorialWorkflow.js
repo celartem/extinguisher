@@ -38,6 +38,8 @@ export const UNPUBLISHED_ENTRY_DELETE_REQUEST = 'UNPUBLISHED_ENTRY_DELETE_REQUES
 export const UNPUBLISHED_ENTRY_DELETE_SUCCESS = 'UNPUBLISHED_ENTRY_DELETE_SUCCESS';
 export const UNPUBLISHED_ENTRY_DELETE_FAILURE = 'UNPUBLISHED_ENTRY_DELETE_FAILURE';
 
+export const UNPUBLISHED_ENTRY_TOGGLE_DISPLAY = 'UNPUBLISHED_ENTRY_TOGGLE_DISPLAY';
+
 /*
  * Simple Action Creators (Internal)
  */
@@ -208,6 +210,13 @@ function unpublishedEntryDeleteError(collection, slug, transactionID) {
     type: UNPUBLISHED_ENTRY_DELETE_FAILURE,
     payload: { collection, slug },
     optimist: { type: REVERT, id: transactionID },
+  };
+}
+
+function unpublishedEntryToggleDisplay(collection, slug) {
+  return {
+    type: UNPUBLISHED_ENTRY_TOGGLE_DISPLAY,
+    payload: { collection, slug },
   };
 }
 
@@ -386,4 +395,8 @@ export function publishUnpublishedEntry(collection, slug) {
       dispatch(unpublishedEntryPublishError(collection, slug, transactionID));
     });
   };
+}
+
+export function toggleDisplay(collection, slug) {
+  return dispatch => dispatch(unpublishedEntryToggleDisplay(collection, slug));
 }

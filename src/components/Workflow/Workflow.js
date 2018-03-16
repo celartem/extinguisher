@@ -8,7 +8,8 @@ import {
   loadUnpublishedEntries,
   updateUnpublishedEntryStatus,
   publishUnpublishedEntry,
-  deleteUnpublishedEntry
+  deleteUnpublishedEntry,
+  toggleDisplay,
 } from 'Actions/editorialWorkflow';
 import { selectUnpublishedEntriesByStatus } from 'Reducers';
 import { EDITORIAL_WORKFLOW, status } from 'Constants/publishModes';
@@ -25,6 +26,7 @@ class Workflow extends Component {
     updateUnpublishedEntryStatus: PropTypes.func.isRequired,
     publishUnpublishedEntry: PropTypes.func.isRequired,
     deleteUnpublishedEntry: PropTypes.func.isRequired,
+    toggleDisplay: PropTypes.func.isRequired,
   };
 
   componentDidMount() {
@@ -42,6 +44,7 @@ class Workflow extends Component {
       updateUnpublishedEntryStatus,
       publishUnpublishedEntry,
       deleteUnpublishedEntry,
+      toggleDisplay,
       collections,
     } = this.props;
 
@@ -49,6 +52,7 @@ class Workflow extends Component {
     if (isFetching) return <Loader active>Loading Editorial Workflow Entries</Loader>;
     const reviewCount = unpublishedEntries.get('pending_review').size;
     const readyCount = unpublishedEntries.get('pending_publish').size;
+    let branchName;
 
     return (
       <div className="nc-workflow">
@@ -58,7 +62,7 @@ class Workflow extends Component {
             <Dropdown
               label="New Post"
               dropdownWidth="160px"
-              dropdownPosition="left"
+              dropdownPosition="right"
               dropdownTopOverlap="40px"
             >
               {
@@ -72,15 +76,36 @@ class Workflow extends Component {
               }
             </Dropdown>
           </div>
-          <p className="nc-workflow-top-description">
+          <div className="nc-workflow-top-description">
             {reviewCount} {reviewCount === 1 ? 'entry' : 'entries'} waiting for review, {readyCount} ready to go live.
-          </p>
+            <Dropdown
+              label="Select Branch"
+              dropdownTopOverlap="40px"
+              dropdownWidth="max-content"
+              dropdownPosition="right"
+            >
+              {
+                unpublishedEntries.get('draft').map(entry => 
+                  <DropdownItem 
+                    key={entry.get('metaData').get('branch')}
+                    label={entry.get('metaData').get('branch')}
+                    onClick={() => {
+                      branchName = entry.get('metaData').get('branch');
+                      console.info('branchName = ' + branchName);
+                      // TODO this needs to trigger WorkflowList.renderColumns()
+                    }}
+                  /> 
+                )
+              }
+            </Dropdown>
+          </div>
         </div>
         <WorkflowList
           entries={unpublishedEntries}
           handleChangeStatus={updateUnpublishedEntryStatus}
           handlePublish={publishUnpublishedEntry}
           handleDelete={deleteUnpublishedEntry}
+          toggleDisplay={toggleDisplay}
         />
       </div>
     );
@@ -113,4 +138,5 @@ export default connect(mapStateToProps, {
   updateUnpublishedEntryStatus,
   publishUnpublishedEntry,
   deleteUnpublishedEntry,
+  toggleDisplay,
 })(Workflow);

@@ -25,5 +25,12 @@
 }
 
 .nc-workflow-top-description {
-  @apply(--cardTopDescription);
+  font-size: 14px;
+  margin-top: 8px;
+  display: flex;
+  justify-content: space-between;
+
+  & span[role="button"] {
+    @apply(--dropShadowDeep);
+  }
 }

@@ -33,6 +33,7 @@ class WorkflowList extends React.Component {
     handleChangeStatus: PropTypes.func.isRequired,
     handlePublish: PropTypes.func.isRequired,
     handleDelete: PropTypes.func.isRequired,
+    toggleDisplay: PropTypes.func.isRequired,
   };
 
   getDeployPreview = (previewUrl) => {
@@ -64,6 +65,10 @@ Please drag the card to the "Ready" column to enable publishing.`
       return;
     }
     this.props.handlePublish(collection, slug);
+  };
+
+  toggleCardDisplay = (collection, slug) => {
+    this.props.toggleDisplay(collection, slug);
   };
 
   renderColumns = (entries, column) => {
@@ -106,6 +111,7 @@ Please drag the card to the "Ready" column to enable publishing.`
             const isModification = entry.get('isModification');
             const canPublish = ownStatus === status.last() && !entry.get('isPersisting', false);
             const previewUrl = entry.getIn(['metaData', 'pr', 'target_url']);
+            const isHidden = entry.get('isHidden');
             return (
               <DragSource
                 namespace={DNDNamespace}
@@ -129,6 +135,8 @@ Please drag the card to the "Ready" column to enable publishing.`
                     canPublish={canPublish}
                     onPublish={this.requestPublish.bind(this, collection, slug, ownStatus)}
                     getPreview={this.getDeployPreview.bind(this, previewUrl)}
+                    isHidden={isHidden}
+                    toggleHidden={this.toggleCardDisplay.bind(this, collection, slug)}
                   />
                 </div>
               )}
